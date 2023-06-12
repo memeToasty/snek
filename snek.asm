@@ -12,6 +12,7 @@
 ; FE Parent Right
 
 ; C3 Fruit
+ZUF8R EQU 0x07
 
 CSEG At 0H
 jmp init
@@ -20,7 +21,7 @@ ORG 100H
 Init:
 Init_Random:
 ;Put Seed in R7
-MOV A, #090h
+MOV A, #01Fh
 MOV R7, A
 MOV R0, #030h
 MOV @R0, #0C3h
@@ -196,9 +197,23 @@ PutRandomFruit:
 
 ; Save R1
 PUSH 0x01
-MOV A, R1
-ADD A, #001h
-MOV R1, A
+InvalidGenerated:
+MOV A, ZUF8R
+JNZ ZUB
+CPL A
+MOV ZUF8R, A
+ZUB:
+ANL A, #10111000b
+MOV C, P
+MOV A, ZUF8R
+RLC A
+MOV ZUF8R, A
+
+ANL A, #00111111b
+ADD A, #020h
+
+MOV R1,A
+CJNE @R1, #00h, InvalidGenerated
 MOV @R1, #0C3h
 ; Put R1 back
 POP 0x01
